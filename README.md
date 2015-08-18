@@ -14,7 +14,7 @@ Simple Imageboard CLI Downloader.
 **Usage**
 
 ```python
-python main.py <tags> <limit> <booru>
+usage: main.py [-h] [--dir DIR] <tags> <limit> <booru>
 ```
 
 Argument  | Description
@@ -22,16 +22,6 @@ Argument  | Description
 | Tags  | Tags can be as simple as character name (e.g. misaka_mikoto, uzumaki_naruto) or by adding extra tag wrapped in quotation mark (e.g. "shana short_hair"). |
 | Limit | Enter how much limit of images to download. |
 | Booru | Enter imageboard you prefer to use. Refer to [list of supported keywords](https://github.com/Zerocchi/DownBooru/blob/master/docs/supported.md) |
-
-
-For now the default save location is at `~/Downloads/Downbooru`, will add support to choose other directory easily.
-
-Or you can manually edit the location path by opening `main.py` and edit
-
-```python
-makefile(<path>)
-```
-to your desired path.
-
+| dir | Download folder |
 **Dependencies**:
 * BeautifulSoup4
