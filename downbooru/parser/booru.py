@@ -1,8 +1,17 @@
 __author__ = 'zerocchi'
 
 from bs4 import BeautifulSoup
-import urllib.request
+try:
+    from urllib.request import Request, urlopen, HTTPError  # Python 3
+except:
+    from urllib2 import Request, urlopen, HTTPError  # Python 2
+import requests
 
+class ImageNotFoundError(Exception):
+    """Exception raised when image not found in page"""
+
+class TagsNotFoundError(Exception):
+    """Exception raised when image with tags not found in page"""
 
 class Booru:
 
@@ -23,7 +32,46 @@ class Booru:
         """
         raise NotImplementedError("parse() method not implemented.")
 
-
+class Sankakuidol(Booru): 
+    base_url = u'https://idol.sankakucomplex.com'
+    api_url = u'/?tags={0}&page={1}'       
+    def __init__(self, tags, limit):
+        self.tags = tags
+        self.limit = limit
+        
+        
+    def parse(self):
+        links = []
+        url_template = self.base_url + self.api_url
+        # search tag(s) with first page
+        page_num = 1 
+        # TODO: check if self.limit = 0
+        try :
+            img_links = []
+            while len(img_links) < self.limit :
+                url = url_template.format(self.tags, str(page_num))
+                # 1 page contain 20 image links
+                url_soup = super(Booru,self).get_data(url)
+                self.url_soup = url_soup
+                if url_soup is None :
+                    raise ImageNotFoundError
+                img_links = filter(lambda x: x.parent.get('class')[0] != 'popular-preview-post',
+                  url_soup.find_all('span', {'class':'thumb'}))
+                self.img_links = img_links
+                
+                if len(img_links) == 0 and page_num == 1:
+                    raise TagsNotFoundError('Tags not found') 
+                elif len(img_links) >self.limit and page_num !=1:
+                    raise ImageNotFoundError('Image end at page {0}'.format(page_num-1))
+                
+                for link in img_links : # parse the found links
+                    html = super().get_data(self.base_url + link)
+                    if len(links)< self.limit :
+                        links.append(html.find('a', {'id':'highres'}).get('href')[0])
+                page_num += 1
+        except ImageNotFoundError:
+            pass
+    
 class Gelbooru(Booru):
 
     base_url = "http://gelbooru.com"
