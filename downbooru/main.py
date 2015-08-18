@@ -33,7 +33,11 @@ if __name__ == "__main__":
     try:
         args = parse_args(sys.argv[1:])
         tag = runbooru(args.tags, args.limit, args.booru)
-        util.makefile(args.dir)  # Make file if it doesn't exist
+        # util.makefile(args.dir)  # Make file if it doesn't exist
+        # Create the specified directory if it doesn't already exist.
+        if not pathexists(args.dir):
+            mkdir(args.dir)
+
         # Download each images from parsed URLs
         [urllib.request.urlretrieve(url, "{0}/{1}".format(os.getcwd(), url.split("/")[-1])) for url in tag.parse()]
     except ValueError:
